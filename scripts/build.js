@@ -1,3 +1,5 @@
+// 这个是项目的构建入口文件
+// "build": "node scripts/build.js",
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
@@ -8,6 +10,7 @@ if (!fs.existsSync('dist')) {
   fs.mkdirSync('dist')
 }
 
+// 基于 config.js 配置文件，获取配置参数
 let builds = require('./config').getAllBuilds()
 
 // filter builds via command line arg

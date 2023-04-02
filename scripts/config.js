@@ -17,24 +17,46 @@ const banner =
   ' */'
 
 const weexFactoryPlugin = {
-  intro () {
+  intro() {
     return 'module.exports = function weexFactory (exports, document) {'
   },
-  outro () {
+  outro() {
     return '}'
   }
 }
 
+// aliases 封装了别名的处理
 const aliases = require('./alias')
+// 这个函数用于解析路径的别名
 const resolve = p => {
-  const base = p.split('/')[0]
-  if (aliases[base]) {
+  // 以 'web/entry-runtime.js' 为例
+  const base = p.split('/')[0] // base: 'web'，这里 base 其实是别名
+  // 通过 aliases 解析别名
+  if (aliases[base]) {  // aliases[base]: vue-2.6.14/src/platforms/web/
+    // 拼接成 vue-2.6.14/src/platforms/web/entry-runtime.js
     return path.resolve(aliases[base], p.slice(base.length + 1))
   } else {
+    // base 为 undefined 时，相当于 `vue-2.6.14/${p}`
     return path.resolve(__dirname, '../', p)
   }
+
+  // 通过调用 aliases 解析别名的所在路径
+  // 再通过 path.resolve 拼接文件名称
+  // 就能找到 vue-2.6.14/src/platforms/web/ 下对应的源码文件
 }
 
+// 核心的 Vue.js 构建配置在这里
+// 这里面包含了
+// 服务端渲染的 webpack 插件
+// weex 打包配置
+// 单个配置都是遵循 rollup 的配置规则的
+// entry 是构建入口
+// dest 是构建产物目录
+// format 是构建格式
+//   cjs 是 CommonJS 规范
+//   es 是 ESModule 规范
+//   umd 是 UMD 规范
+// banner 里面塞入了版本相关信息
 const builds = {
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
   'web-runtime-cjs-dev': {
@@ -57,7 +79,7 @@ const builds = {
     dest: resolve('dist/vue.common.dev.js'),
     format: 'cjs',
     env: 'development',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   'web-full-cjs-prod': {
@@ -65,7 +87,7 @@ const builds = {
     dest: resolve('dist/vue.common.prod.js'),
     format: 'cjs',
     env: 'production',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   // Runtime only ES modules build (for bundlers)
@@ -80,7 +102,7 @@ const builds = {
     entry: resolve('web/entry-runtime-with-compiler.js'),
     dest: resolve('dist/vue.esm.js'),
     format: 'es',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   // Runtime+compiler ES modules build (for direct import in browser)
@@ -90,7 +112,7 @@ const builds = {
     format: 'es',
     transpile: false,
     env: 'development',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   // Runtime+compiler ES modules build (for direct import in browser)
@@ -100,7 +122,7 @@ const builds = {
     format: 'es',
     transpile: false,
     env: 'production',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   // runtime-only build (Browser)
@@ -125,7 +147,7 @@ const builds = {
     dest: resolve('dist/vue.js'),
     format: 'umd',
     env: 'development',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   // Runtime+compiler production build  (Browser)
@@ -134,7 +156,7 @@ const builds = {
     dest: resolve('dist/vue.min.js'),
     format: 'umd',
     env: 'production',
-    alias: { he: './entity-decoder' },
+    alias: {he: './entity-decoder'},
     banner
   },
   // Web compiler (CommonJS).
@@ -213,7 +235,7 @@ const builds = {
   }
 }
 
-function genConfig (name) {
+function genConfig(name) {
   const opts = builds[name]
   const config = {
     input: opts.entry,
