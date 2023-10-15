@@ -1,16 +1,16 @@
 /* @flow */
 /* globals MutationObserver */
 
-import { noop } from 'shared/util'
-import { handleError } from './error'
-import { isIE, isIOS, isNative } from './env'
+import {noop} from 'shared/util'
+import {handleError} from './error'
+import {isIE, isIOS, isNative} from './env'
 
 export let isUsingMicroTask = false
 
 const callbacks = []
 let pending = false
 
-function flushCallbacks () {
+function flushCallbacks() {
   pending = false
   const copies = callbacks.slice(0)
   callbacks.length = 0
@@ -59,12 +59,17 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
   // Use MutationObserver where native Promise is not available,
   // e.g. PhantomJS, iOS7, Android 4.4
   // (#6466 MutationObserver is unreliable in IE11)
+
+  // 如果平台不支持 Promise，Vue 中通过 MutationObserver 接口
+  // 观察一个文本节点实现微任务
   let counter = 1
   const observer = new MutationObserver(flushCallbacks)
+  // 这里创建了一个文本节点，因为资源占用较轻
   const textNode = document.createTextNode(String(counter))
   observer.observe(textNode, {
     characterData: true
   })
+  // 通过修改文本节点的值可以触发 observer 的回调
   timerFunc = () => {
     counter = (counter + 1) % 2
     textNode.data = String(counter)
@@ -84,7 +89,7 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
   }
 }
 
-export function nextTick (cb?: Function, ctx?: Object) {
+export function nextTick(cb?: Function, ctx?: Object) {
   let _resolve
   callbacks.push(() => {
     if (cb) {
