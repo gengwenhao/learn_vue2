@@ -159,6 +159,7 @@ export function defineReactive (
     configurable: true,
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
+      // 收集依赖
       if (Dep.target) {
         dep.depend()
         if (childOb) {
@@ -188,6 +189,7 @@ export function defineReactive (
         val = newVal
       }
       childOb = !shallow && observe(newVal)
+      // 通知更新
       dep.notify()
     }
   })

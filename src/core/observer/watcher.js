@@ -66,6 +66,7 @@ export default class Watcher {
       this.deep = this.user = this.lazy = this.sync = false
     }
     this.cb = cb
+    // 通过这个 id 保证了 watcher 的唯一性
     this.id = ++uid // uid for batching
     this.active = true
     this.dirty = this.lazy // for lazy watchers

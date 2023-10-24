@@ -184,6 +184,7 @@ export function queueWatcher (watcher: Watcher) {
         flushSchedulerQueue()
         return
       }
+      // flushSchedulerQueue 就是调用了全部的 Watcher
       nextTick(flushSchedulerQueue)
     }
   }
